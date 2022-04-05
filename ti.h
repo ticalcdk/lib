@@ -2,6 +2,13 @@
 #ifndef TI_H
 #define TI_H
 
+void main();
+
+int entry() {
+    main();
+    return 0;
+}
+
 unsigned char tiKeypad[8];
 unsigned char tiPrevKeypad[8];
 
