@@ -1,3 +1,4 @@
+#define TI84PCSE
 
 #ifndef TI_H
 #define TI_H
@@ -9,25 +10,15 @@ int entry() {
     return 0;
 }
 
-unsigned char tiKeypad[8];
-unsigned char tiPrevKeypad[8];
+int max(int a, int b);
+int min(int a, int b);
 
-#define TI_JUST_PRESSED(group) (tiKeypad[group] & (tiKeypad[group] ^ tiPrevKeypad[group]))
-#define TI_JUST_RELEASED(group) ((~tiKeypad[group]) & (tiKeypad[group] ^ tiPrevKeypad[group]))
-
+void tiPoint(int x, int y, unsigned int c);
 void tiRect(int x, int y, int w, int h, unsigned int c);
 void tiRefreshKeys();
 
 #ifdef TI84PCSE
-
-#define TI_SCREEN_W ((unsigned int)320)
-#define TI_SCREEN_H ((unsigned int)240)
-
-#define TI_COLOR_BLACK 0x0000
-#define TI_COLOR_WHITE 0xFFFF
-
-#define TI_GLOBAL_START 0x987C
-
+#include "ti84pcse.h"
 #endif
 
 void memcpy(char* dst, char* src, int size);

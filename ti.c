@@ -6,12 +6,25 @@ void memcpy(char* dst, char* src, int size) {
         dst[i] = src[i];
 }
 
-void tiRect(int x, int y, int w, int h, unsigned int c) { // TODO: make this use a buffer instead of 0x8100
+int max(int a, int b) {
+    return a > b ? a : b;
+}
+
+int min(int a, int b) {
+    return a < b ? a : b;
+}
+
+void tiPoint(int x, int y, unsigned int c) {
+    tiRect(x, y, 1, 1, c);
+}
+
+void tiRect(int x, int y, int w, int h, unsigned int c) {
+    
     *((int*)(0x8100)) = c;
-    *((int*)(0x8102)) = y;
-    *((int*)(0x8104)) = y + h - 1;
-    *((int*)(0x8106)) = x;
-    *((int*)(0x8108)) = x + w - 1;
+    *((int*)(0x8102)) = max(y, 0);
+    *((int*)(0x8104)) = min(y + h - 1, TI_SCREEN_H);
+    *((int*)(0x8106)) = max(x, 0);
+    *((int*)(0x8108)) = min(x + w - 1, TI_SCREEN_W);
     __asm
         ld hl, (0x8100) ; set color
         ld (0xA5F4), hl
@@ -110,4 +123,47 @@ unsigned int rand() {
     rngSeed ^= rngSeed >> (unsigned int)9;
     rngSeed ^= rngSeed << (unsigned int)8;
     return rngSeed;
+}
+
+void tiWriteLCDRegAddr(unsigned char addr) { // these use some nasty sdcc abi stuff
+    __asm
+        out (0x10), a
+        out (0x10), a
+    __endasm;
+}
+
+void tiWriteLCDVal(unsigned int val) {
+    __asm
+        ld a, h
+        out (0x11), a
+        ld a, l
+        out (0x11), a
+    __endasm;
+}
+
+void tiLCDMoveCursor(unsigned int x, unsigned int y) {
+    tiWriteLCDRegAddr(0x20);
+    tiWriteLCDVal(x);
+    tiWriteLCDRegAddr(0x21);
+    tiWriteLCDVal(y);
+}
+
+void tiLCDSetWinLeft(unsigned int left) {
+    tiWriteLCDRegAddr(0x52);
+    tiWriteLCDVal(left);
+}
+
+void tiLCDSetWinRight(unsigned int right) {
+    tiWriteLCDRegAddr(0x53);
+    tiWriteLCDVal(right);
+}
+
+void tiLCDSetWinTop(unsigned int top) {
+    tiWriteLCDRegAddr(0x50);
+    tiWriteLCDVal(top);
+}
+
+void tiLCDSetWinBottom(unsigned int bottom) {
+    tiWriteLCDRegAddr(0x51);
+    tiWriteLCDVal(bottom);
 }
